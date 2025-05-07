@@ -9,10 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import kho_cang.api.core.gencode.ApiResponse;
 import kho_cang.api.core.gencode.TokenResponse;
 import kho_cang.api.entiy.dto.LoginRequest;
+import kho_cang.api.entiy.system.SysMenu;
 import kho_cang.api.entiy.system.SysUser;
+import kho_cang.api.repository.system.SysRoleMenuRepository;
 import kho_cang.api.repository.user.UserRepository;
 
 @RestController
@@ -29,14 +36,17 @@ public class AuthController {
     private UserRepository userRepository;
 
     @Autowired
+    private SysRoleMenuRepository sysRoleMenuRepository;
+
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponse>> login(@RequestBody LoginRequest loginRequest) {
         String username = loginRequest.getUsername();
         String rawPassword = loginRequest.getPassword();
+        String menuUser = "";
 
-        // Tìm user trong DB
         SysUser user = userRepository.findByUsername(username);
 
         if (user == null || !passwordEncoder.matches(rawPassword, user.getPassword())) {
@@ -50,16 +60,50 @@ public class AuthController {
         // Lấy danh sách vai trò từ repository
         List<String> roles = userRepository.findRolesByUsername(username);
 
+        if (user != null) {
+            Long userId = user.getId();
+            List<Object[]> menusWithPermission = sysRoleMenuRepository.findMenusWithPermissionByUserId(userId);
+
+            ObjectMapper mapper = new ObjectMapper();
+            ArrayNode menuArray = mapper.createArrayNode();
+
+            if (!menusWithPermission.isEmpty()) {
+                for (Object[] result : menusWithPermission) {
+                    SysMenu menu = (SysMenu) result[0];
+                    String permissionType = (String) result[1];
+                    String link = result.length > 2 ? (String) result[2] : "";
+                    String icon = result.length > 3 ? (String) result[3] : "";
+                    String label = result.length > 4 ? (String) result[4] : "";
+
+                    ObjectNode menuNode = mapper.createObjectNode();
+                    menuNode.put("id", menu.getId());
+                    menuNode.put("label", label);
+                    menuNode.put("link", link);
+                    menuNode.put("icon", icon);
+                    menuNode.put("permission", permissionType);
+
+                    menuArray.add(menuNode); // Thêm từng menu vào mảng
+                }
+            } 
+
+            try {
+                menuUser = mapper.writeValueAsString(menuArray);
+                System.out.println("menuUser: " + menuUser); // In ra menuUser để kiểm tra
+            } catch (JsonProcessingException e) {
+                System.err.println("Error while converting menuArray to JSON: " + e.getMessage());
+            }            
+        }
+
         // Tạo token với username và roles
         String token = jwtService.generateToken(user.getUsername(), roles);
-        TokenResponse tokenData = new TokenResponse(token, "Bearer", 86400); // 1 ngày
+        TokenResponse tokenData = new TokenResponse(token, menuUser);
 
         // Trả về kết quả thành công
         ApiResponse<TokenResponse> response = new ApiResponse<>(
                 ApiResponse.Status.SUCCESS,
                 "Đăng nhập thành công",
                 200,
-                tokenData // Gửi kèm dữ liệu token
+                tokenData
         );
         return ResponseEntity.ok(response);
     }

@@ -8,7 +8,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableMethodSecurity
@@ -19,29 +18,6 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
-
-    // @Bean
-    // public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    //     http
-    //         .csrf(csrf -> csrf.disable())
-    //         .authorizeHttpRequests(auth -> auth
-    //             .requestMatchers(
-    //                 "/api/login",
-    //                 "/swagger-ui/**",
-    //                 "/v3/api-docs/**",
-    //                 "/public/**"
-    //             ).permitAll()
-    //             .anyRequest().authenticated()
-    //         )
-    //         .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    //         .formLogin(form -> form.disable())
-    //         .httpBasic(basic -> basic.disable())
-
-    //         // 🔥 Thêm dòng này để kích hoạt filter của bạn
-    //         .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
-
-    //     return http.build();
-    // }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

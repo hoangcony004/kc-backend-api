@@ -2,13 +2,11 @@ package kho_cang.api.core.gencode;
 
 public class TokenResponse {
     private String token;
-    private String type;
-    private long expiresIn;
+    private String menu;
 
-    public TokenResponse(String token, String type, long expiresIn) {
+    public TokenResponse(String token, String menu) {
         this.token = token;
-        this.type = type;
-        this.expiresIn = expiresIn;
+        this.menu = menu;
     }
 
     public String getToken() {
@@ -19,19 +17,11 @@ public class TokenResponse {
         this.token = token;
     }
 
-    public String getType() {
-        return type;
+    public String getMenu() {
+        return menu;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public long getExpiresIn() {
-        return expiresIn;
-    }
-
-    public void setExpiresIn(long expiresIn) {
-        this.expiresIn = expiresIn;
+    public void setMenu(String menu) {
+        this.menu = menu;
     }
 }
