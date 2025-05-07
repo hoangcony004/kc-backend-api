@@ -6,8 +6,9 @@ public class ApiResponse<T> {
         ERROR("error"),
         WARNING("warning"),
         INFO("info");
+
         private final String status;
-        
+
         Status(String status) {
             this.status = status;
         }
@@ -16,11 +17,11 @@ public class ApiResponse<T> {
             return status;
         }
     }
-    
-    private Status status; 
+
+    private Status status;
     private String message;
     private int code;
-    private T data;
+    private T data; // Kiểu generic T
 
     // Constructor thành công
     public ApiResponse(Status status, String message, int code, T data) {
@@ -70,4 +71,3 @@ public class ApiResponse<T> {
         this.data = data;
     }
 }
-
