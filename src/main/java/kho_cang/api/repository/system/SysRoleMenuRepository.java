@@ -11,7 +11,7 @@ import kho_cang.api.entiy.system.SysRoleMenu;
 public interface SysRoleMenuRepository extends JpaRepository<SysRoleMenu, Long> {
 
     @Query("""
-                SELECT m, rm.permissionType, m.link, m.icon, m.label
+                SELECT m, rm.permissionType, m.link, m.icon, m.label, m.parent.id
                 FROM SysUser u
                 JOIN SysUserRole ur ON ur.user.id = u.id
                 JOIN SysRole r ON ur.role.id = r.id
@@ -19,6 +19,6 @@ public interface SysRoleMenuRepository extends JpaRepository<SysRoleMenu, Long> 
                 JOIN SysMenu m ON m.id = rm.menu.id
                 WHERE u.id = :userId
             """)
-    List<Object[]> findMenusWithPermissionByUserId(@Param("userId") Long userId);
+    List<Object[]> findMenuByUserId(@Param("userId") Long userId);
 
 }
