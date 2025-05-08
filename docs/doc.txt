@@ -1,0 +1,37 @@
+lỗi ESLint: Delete `␍` (prettier/ prettier)
+fix: npx prettier --write .
+
+Cấu hình NestJS trong dự án:
+a. Tạo một Module:
+NestJS sử dụng module để tổ chức các tính năng trong ứng dụng. Để tạo một module mới, bạn có thể sử dụng CLI:
+
+nest generate module myModule
+b. Tạo Controller:
+Controller trong NestJS là nơi nhận và xử lý các request HTTP. Bạn có thể tạo một controller mới bằng lệnh sau:
+
+nest generate controller myController
+c. Tạo Service:
+Service chứa logic nghiệp vụ của ứng dụng. Để tạo một service, chạy lệnh:
+
+nest generate service myService
+6. Cài đặt và sử dụng các thư viện NestJS khác:
+NestJS hỗ trợ rất nhiều thư viện, ví dụ như:
+
+TypeORM cho kết nối cơ sở dữ liệu:
+
+npm install @nestjs/typeorm typeorm mysql2
+JWT (JSON Web Token) cho xác thực:
+
+npm install @nestjs/jwt passport passport-jwt
+GraphQL:
+
+Tạo Entity trong NestJS
+Tạo một entity để ánh xạ tới bảng trong PostgreSQL. Ví dụ, bạn có thể tạo một User entity.
+
+nest generate entity user
+
+npm install @nestjs/graphql graphql-tools graphql apollo-server-express
+7. Chạy và phát triển dự án NestJS:
+Khi bạn đã cấu hình xong và bắt đầu phát triển dự án, bạn có thể sử dụng các lệnh trong NestJS CLI để tự động tái khởi động server mỗi khi có thay đổi trong mã nguồn (hot-reload):
+
+npm run start:dev

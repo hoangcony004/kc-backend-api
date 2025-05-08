@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -108,16 +107,6 @@ public class AuthController {
                 "Đăng nhập thành công",
                 200,
                 tokenData);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/private/test")
-    public ResponseEntity<ApiResponse<String>> testPrivate() {
-        ApiResponse<String> response = new ApiResponse<>(
-                ApiResponse.Status.SUCCESS,
-                "Đây là API riêng tư",
-                200,
-                "Hello, private world!");
         return ResponseEntity.ok(response);
     }
 

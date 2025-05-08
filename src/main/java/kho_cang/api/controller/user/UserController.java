@@ -40,7 +40,7 @@ public class UserController {
     }
 
     // Get all users
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<SysUser>>> getAllUsers() {
         System.out.println("🔥 Đang xử lý GET /api/private/users");
     
