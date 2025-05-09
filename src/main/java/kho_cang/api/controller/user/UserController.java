@@ -42,10 +42,8 @@ public class UserController {
     // Get all users
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<SysUser>>> getAllUsers() {
-        System.out.println("🔥 Đang xử lý GET /api/private/users");
     
         List<SysUser> users = userService.getAllUsers();
-        System.out.println("✅ Số lượng users: " + users.size());
     
         ApiResponse<List<SysUser>> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Users fetched successfully", 200, users);
         return ResponseEntity.ok(response);

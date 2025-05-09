@@ -42,27 +42,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         String username = jwtService.extractUsername(token);
                         List<String> roles = jwtService.extractRoles(token);
 
-                        // Chuyển đổi roles thành GrantedAuthority (thêm tiền tố ROLE_ nếu cần)
                         List<GrantedAuthority> authorities = roles.stream()
-                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role)) // Thêm ROLE_ nếu cần
-                            .collect(Collectors.toList());
+                                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                                .collect(Collectors.toList());
 
-                        // Tạo và gán Authentication vào SecurityContext
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            username, null, authorities
-                        );
+                                username, null, authorities);
                         SecurityContextHolder.getContext().setAuthentication(authentication);
 
                         chain.doFilter(request, response);
                         return;
+                    } else {
+                        // Token không hợp lệ hoặc đã bị blacklist
+                        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        res.getWriter().write("Token không hợp lệ hoặc đã bị thu hồi.");
+                        return;
                     }
+
                 } catch (Exception e) {
                     res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     res.getWriter().write("Token không hợp lệ: " + e.getMessage());
                     return;
                 }
-                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                res.getWriter().write("Token không hợp lệ.");
             } else {
                 res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 res.getWriter().write("Thiếu token.");

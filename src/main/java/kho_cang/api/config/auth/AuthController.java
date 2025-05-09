@@ -2,6 +2,8 @@ package kho_cang.api.config.auth;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,8 @@ import kho_cang.api.repository.user.UserRepository;
 @RestController
 @RequestMapping("/api")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final JwtService jwtService;
 
@@ -108,6 +112,35 @@ public class AuthController {
                 200,
                 tokenData);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Object>> logout(@RequestBody String token) {
+        
+        try {
+            // Loại bỏ dấu ngoặc kép và khoảng trắng thừa
+            token = token.trim().replaceAll("^\"|\"$", "");
+            
+            // Loại bỏ tiền tố "Bearer " nếu có
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+
+            String username = jwtService.extractUsername(token);
+            jwtService.blacklistToken(token, username);
+
+            ApiResponse<Object> response = new ApiResponse<>(
+                    ApiResponse.Status.SUCCESS,
+                    "Đăng xuất thành công!",
+                    200);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ApiResponse<Object> response = new ApiResponse<>(
+                    ApiResponse.Status.ERROR,
+                    "Lỗi khi đăng xuất: " + e.getMessage(),
+                    500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
 }
