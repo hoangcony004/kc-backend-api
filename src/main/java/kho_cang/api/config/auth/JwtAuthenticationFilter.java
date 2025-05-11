@@ -11,10 +11,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kho_cang.api.core.gencode.ApiResponse;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -53,10 +56,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         chain.doFilter(request, response);
                         return;
                     } else {
-                        // Token không hợp lệ hoặc đã bị blacklist
+                        ApiResponse<Object> apiResponse = new ApiResponse<>(
+                                ApiResponse.Status.ERROR,
+                                "Phiên đăng nhập hết hạn.",
+                                HttpServletResponse.SC_UNAUTHORIZED);
+
                         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        res.getWriter().write("Token không hợp lệ hoặc đã bị thu hồi.");
-                        return;
+                        res.setContentType("application/json");
+                        res.setCharacterEncoding("UTF-8");
+
+                        ObjectMapper mapper = new ObjectMapper();
+                        res.getWriter().write(mapper.writeValueAsString(apiResponse));
+
                     }
 
                 } catch (Exception e) {

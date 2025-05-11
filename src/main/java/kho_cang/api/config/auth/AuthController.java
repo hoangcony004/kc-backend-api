@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import kho_cang.api.core.gencode.ApiResponse;
 import kho_cang.api.core.gencode.TokenResponse;
 import kho_cang.api.entiy.dto.LoginRequest;
+import kho_cang.api.entiy.dto.UserDTO;
 import kho_cang.api.entiy.system.SysMenu;
 import kho_cang.api.entiy.system.SysUser;
 import kho_cang.api.repository.system.SysRoleMenuRepository;
@@ -103,7 +104,9 @@ public class AuthController {
         }
         // Tạo token với username và roles
         String token = jwtService.generateToken(user.getUsername(), roles);
-        TokenResponse tokenData = new TokenResponse(token, menuUser);
+        UserDTO userDto = new UserDTO(user);
+        TokenResponse tokenData = new TokenResponse(token, menuUser, userDto);
+        // TokenResponse tokenData = new TokenResponse(token, menuUser, user);
 
         // Trả về kết quả thành công
         ApiResponse<TokenResponse> response = new ApiResponse<>(
@@ -116,11 +119,11 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Object>> logout(@RequestBody String token) {
-        
+
         try {
             // Loại bỏ dấu ngoặc kép và khoảng trắng thừa
             token = token.trim().replaceAll("^\"|\"$", "");
-            
+
             // Loại bỏ tiền tố "Bearer " nếu có
             if (token.startsWith("Bearer ")) {
                 token = token.substring(7);

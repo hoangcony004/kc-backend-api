@@ -1,12 +1,16 @@
 package kho_cang.api.core.gencode;
 
+import kho_cang.api.entiy.dto.UserDTO;
+
 public class TokenResponse {
     private String token;
     private String menu;
+    private UserDTO user;
 
-    public TokenResponse(String token, String menu) {
+    public TokenResponse(String token, String menu, UserDTO user) {
         this.token = token;
         this.menu = menu;
+        this.user = user;
     }
 
     public String getToken() {
@@ -23,5 +27,13 @@ public class TokenResponse {
 
     public void setMenu(String menu) {
         this.menu = menu;
+    }
+
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 }
