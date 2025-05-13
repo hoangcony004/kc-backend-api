@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import kho_cang.api.entiy.system.SysUser;
@@ -23,8 +25,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<SysUser> getAllUsers() {
-        return userRepository.findAll();
+    public Page<SysUser> getUsersWithPaging(String strKey, Pageable pageable) {
+        if (strKey != null && !strKey.isEmpty()) {
+            return userRepository.findByUsernameContainingIgnoreCase(strKey, pageable);
+        } else {
+            return userRepository.findAll(pageable);
+        }
     }
 
     public Optional<SysUser> getUserById(Long id) {

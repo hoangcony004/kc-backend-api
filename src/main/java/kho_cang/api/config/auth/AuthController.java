@@ -103,7 +103,7 @@ public class AuthController {
             System.err.println("Error while converting menuArray to JSON: " + e.getMessage());
         }
         // Tạo token với username và roles
-        String token = jwtService.generateToken(user.getUsername(), roles);
+        String token = jwtService.generateToken(user.getUsername(), roles, user.getUnitcode());
         UserDTO userDto = new UserDTO(user);
         TokenResponse tokenData = new TokenResponse(token, menuUser, userDto);
         // TokenResponse tokenData = new TokenResponse(token, menuUser, user);

@@ -35,10 +35,11 @@ public class JwtService {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String username, List<String> roles) {
+    public String generateToken(String username, List<String> roles, String unitCode) {
         String token = Jwts.builder()
                 .setSubject(username)
                 .claim("roles", roles)
+                .claim("unitcode", unitCode)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
@@ -46,8 +47,8 @@ public class JwtService {
         return token;
     }
 
-    public String generateToken(String username) {
-        return generateToken(username, Collections.emptyList());
+    public String generateToken(String username, String unitCode) {
+        return generateToken(username, Collections.emptyList(), unitCode);
     }
 
     public String extractUsername(String token) {
@@ -57,7 +58,7 @@ public class JwtService {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            
+
             String username = claims.getSubject();
             return username;
         } catch (SignatureException e) {
@@ -69,13 +70,13 @@ public class JwtService {
 
     public List<String> extractRoles(String token) {
         try {
-            
+
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(getSignKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            
+
             List<String> roles = claims.get("roles", List.class);
             return roles;
         } catch (SignatureException e) {
@@ -86,7 +87,7 @@ public class JwtService {
     }
 
     public boolean isValidToken(String token) {
-        
+
         if (tokenBlacklistService.isTokenBlacklisted(token)) {
             return false;
         }
@@ -97,7 +98,7 @@ public class JwtService {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            
+
             logger.debug("Token claims: {}", claims);
             return true;
         } catch (SignatureException e) {
