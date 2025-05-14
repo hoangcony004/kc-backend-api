@@ -73,7 +73,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 } catch (Exception e) {
                     res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     res.getWriter().write("Token không hợp lệ: " + e.getMessage());
-                    return;
                 }
             } else {
                 res.setStatus(HttpServletResponse.SC_FORBIDDEN);
