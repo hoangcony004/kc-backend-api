@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,12 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import kho_cang.api.core.gencode.ApiResponse;
 import kho_cang.api.core.pages.PageModel;
 import kho_cang.api.entiy.system.SysUser;
@@ -35,77 +35,95 @@ public class UserController {
     }
 
     // Create a new user
-    @PostMapping
+    @PostMapping("/insert")
     public ResponseEntity<ApiResponse> createUser(@RequestBody SysUser user) {
-        SysUser createdUser = userService.createUser(user);
-        ApiResponse response = new ApiResponse(ApiResponse.Status.SUCCESS, "User created successfully", 201,
-                createdUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        try {
+            SysUser createdUser = userService.createUser(user);
+            ApiResponse response = new ApiResponse(ApiResponse.Status.SUCCESS, "Thành công!", 201, createdUser);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            ApiResponse response = new ApiResponse(ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(), 500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
-    // Get all users
-    @PostMapping("/search&paging")
-    public ResponseEntity<ApiResponse<List<SysUser>>> getAllUsers(@RequestBody PageModel pageModel) {
-        int currentPage = pageModel.getCurrentPage();
-        int pageSize = pageModel.getPageSize();
-        String strKey = pageModel.getStrKey();
+    // Post all users
+    @PostMapping("/search-paging")
+    public ResponseEntity<ApiResponse<List<SysUser>>> postAllUsers(@RequestBody PageModel pageModel) {
+        try {
+            int currentPage = pageModel.getCurrentPage();
+            int pageSize = pageModel.getPageSize();
+            String strKey = pageModel.getStrKey();
 
-        if (currentPage < 1) currentPage = 1; 
-        if (pageSize < 10) pageSize = 10; 
-        System.out.println("PageModel: " + pageModel.getCurrentPage() + ", " + pageModel.getPageSize() + ", " + pageModel.getStrKey());
+            Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+            Page<SysUser> pageResult = userService.postUsersWithSearch_Paging(strKey, pageable);
 
-
-        Pageable pageable = PageRequest.of(currentPage, pageSize);
-        Page<SysUser> pageResult = userService.getUsersWithPaging(strKey, pageable);
-
-        ApiResponse<List<SysUser>> response = new ApiResponse<>(
-                ApiResponse.Status.SUCCESS,
-                "Users fetched successfully",
-                200,
-                pageResult.getContent());
-
-        return ResponseEntity.ok(response);
+            ApiResponse<List<SysUser>> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Thành công!", 200,
+                    pageResult.getContent());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ApiResponse<List<SysUser>> response = new ApiResponse<>(ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(),
+                    500, null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
-    // // Get user by ID
-    @GetMapping("/{id}")
+    // Get user by ID
+    @GetMapping("/getOne/{id}")
     public ResponseEntity<ApiResponse<SysUser>> getUserById(@PathVariable Long id) {
-        Optional<SysUser> user = userService.getUserById(id);
-        if (user.isPresent()) {
-            ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "User found", 200,
-                    user.get());
-            return ResponseEntity.ok(response);
-        } else {
-            ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.ERROR, "User not found", 404);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        try {
+            Optional<SysUser> user = userService.getUserById(id);
+            if (user.isPresent()) {
+                ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Thành công!", 200,
+                        user.get());
+                return ResponseEntity.ok(response);
+            } else {
+                ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.ERROR,
+                        "Không tìm thấy người dùng!", 404);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(), 500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-    // // Update user
-    @PutMapping("/{id}")
+    // Update user
+    @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<SysUser>> updateUser(@PathVariable Long id, @RequestBody SysUser userDetails) {
-        SysUser updatedUser = userService.updateUser(id, userDetails);
-        if (updatedUser != null) {
-            ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "User updated successfully",
-                    200, updatedUser);
-            return ResponseEntity.ok(response);
-        } else {
-            ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.ERROR, "User not found", 404);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        try {
+            SysUser updatedUser = userService.updateUser(id, userDetails);
+            if (updatedUser != null) {
+                ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Thành công!", 200,
+                        updatedUser);
+                return ResponseEntity.ok(response);
+            } else {
+                ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.ERROR,
+                        "Không thể cập nhật người dùng", 404);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(), 500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-    // // Delete user
-    @DeleteMapping("/{id}")
+    // Delete user
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
-        boolean isDeleted = userService.deleteUser(id);
-        if (isDeleted) {
-            ApiResponse<Void> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "User deleted successfully", 200,
-                    null);
-            return ResponseEntity.ok(response);
-        } else {
-            ApiResponse<Void> response = new ApiResponse<>(ApiResponse.Status.ERROR, "User not found", 404);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        try {
+            boolean isDeleted = userService.deleteUser(id);
+            if (isDeleted) {
+                ApiResponse<Void> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Thành công!", 200, null);
+                return ResponseEntity.ok(response);
+            } else {
+                ApiResponse<Void> response = new ApiResponse<>(ApiResponse.Status.ERROR, "Không thể xóa người dùng",
+                        404);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            ApiResponse<Void> response = new ApiResponse<>(ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(), 500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }
