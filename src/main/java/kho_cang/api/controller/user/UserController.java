@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import kho_cang.api.core.gencode.ApiResponse;
+import kho_cang.api.core.gencode.PagedResult;
 import kho_cang.api.core.pages.PageModel;
 import kho_cang.api.entiy.system.SysUser;
 import kho_cang.api.service.user.UserService;
@@ -49,7 +50,7 @@ public class UserController {
 
     // Post all users
     @PostMapping("/search-paging")
-    public ResponseEntity<ApiResponse<List<SysUser>>> postAllUsers(@RequestBody PageModel pageModel) {
+    public ResponseEntity<ApiResponse<PagedResult<SysUser>>> postAllUsers(@RequestBody PageModel pageModel) {
         try {
             int currentPage = pageModel.getCurrentPage();
             int pageSize = pageModel.getPageSize();
@@ -58,12 +59,20 @@ public class UserController {
             Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
             Page<SysUser> pageResult = userService.postUsersWithSearch_Paging(strKey, pageable);
 
-            ApiResponse<List<SysUser>> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Thành công!", 200,
+            PagedResult<SysUser> pagedData = new PagedResult<>(
+                    pageResult.getNumber() + 1,
+                    pageResult.getTotalPages(),
+                    pageResult.getTotalElements(),
+                    pageResult.getSize(),
+                    pageModel.getStrKey(),
                     pageResult.getContent());
+
+            ApiResponse<PagedResult<SysUser>> response = new ApiResponse<>(
+                    ApiResponse.Status.SUCCESS, "Thành công!", 200, pagedData);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            ApiResponse<List<SysUser>> response = new ApiResponse<>(ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(),
-                    500, null);
+            ApiResponse<PagedResult<SysUser>> response = new ApiResponse<>(
+                    ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(), 500, null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

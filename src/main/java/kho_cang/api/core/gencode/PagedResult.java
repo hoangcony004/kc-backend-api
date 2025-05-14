@@ -1,20 +1,25 @@
 package kho_cang.api.core.gencode;
 
-public class PagingResponse {
+import java.util.List;
+
+public class PagedResult<T> {
     private int currentPage;
     private int totalPages;
     private long totalElements;
     private int pageSize;
-    private Object data;
+    private String strKey;
+    private List<T> data;
 
-    public PagingResponse(int currentPage, int totalPages, long totalElements, int pageSize, Object data) {
+    public PagedResult(int currentPage, int totalPages, long totalElements, int pageSize, String strKey, List<T> data) {
         this.currentPage = currentPage;
         this.totalPages = totalPages;
         this.totalElements = totalElements;
         this.pageSize = pageSize;
+        this.strKey = strKey;
         this.data = data;
     }
 
+    // Getters và Setters
     public int getCurrentPage() {
         return currentPage;
     }
@@ -47,11 +52,19 @@ public class PagingResponse {
         this.pageSize = pageSize;
     }
 
-    public Object getData() {
+    public String getStrKey() {
+        return strKey;
+    }
+    
+    public void setStrKey(String strKey) {
+        this.strKey = strKey;
+    }
+
+    public List<T> getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(List<T> data) {
         this.data = data;
     }
 }
