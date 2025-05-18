@@ -40,7 +40,7 @@ public class UserController {
     public ResponseEntity<ApiResponse> createUser(@RequestBody SysUser user) {
         try {
             SysUser createdUser = userService.createUser(user);
-            ApiResponse response = new ApiResponse(ApiResponse.Status.SUCCESS, "Thành công!", 201, createdUser);
+            ApiResponse response = new ApiResponse(ApiResponse.Status.SUCCESS, "Thêm mới thành công!", 200, createdUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             ApiResponse response = new ApiResponse(ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(), 500);
@@ -83,7 +83,7 @@ public class UserController {
         try {
             Optional<SysUser> user = userService.getUserById(id);
             if (user.isPresent()) {
-                ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Thành công!", 200,
+                ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Lấy thông tin thành công!", 200,
                         user.get());
                 return ResponseEntity.ok(response);
             } else {
@@ -103,7 +103,7 @@ public class UserController {
         try {
             SysUser updatedUser = userService.updateUser(id, userDetails);
             if (updatedUser != null) {
-                ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Thành công!", 200,
+                ApiResponse<SysUser> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Chỉnh sửa thành công!", 200,
                         updatedUser);
                 return ResponseEntity.ok(response);
             } else {
@@ -123,7 +123,7 @@ public class UserController {
         try {
             boolean isDeleted = userService.deleteUser(id);
             if (isDeleted) {
-                ApiResponse<Void> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Thành công!", 200, null);
+                ApiResponse<Void> response = new ApiResponse<>(ApiResponse.Status.SUCCESS, "Xóa thành công!", 200, null);
                 return ResponseEntity.ok(response);
             } else {
                 ApiResponse<Void> response = new ApiResponse<>(ApiResponse.Status.ERROR, "Không thể xóa người dùng",
