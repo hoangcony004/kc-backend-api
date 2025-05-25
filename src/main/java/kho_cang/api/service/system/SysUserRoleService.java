@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import kho_cang.api.entiy.dto.UserRoleDTO;
 import kho_cang.api.entiy.system.SysUserRole;
 import kho_cang.api.repository.system.SysUserRoleRepository;
 
@@ -36,9 +37,14 @@ public class SysUserRoleService {
     }
 
     // Example method to get a user role by ID
-    public SysUserRole getUserRoleById(Long id) {
-        // Implement the logic to retrieve a user role by ID
-        return new SysUserRole();
+    public UserRoleDTO getUserRoleByUserId(Long userId) {
+        SysUserRole userRole = sysUserRoleRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new RuntimeException("User role not found for userId: " + userId));
+
+        return new UserRoleDTO(
+                userRole.getUser().getId(),
+                userRole.getUser().getUsername(),
+                userRole.getRole().getName());
     }
 
     // get all user roles

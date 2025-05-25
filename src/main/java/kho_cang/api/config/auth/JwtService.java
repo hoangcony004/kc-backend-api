@@ -59,30 +59,37 @@ public class JwtService {
                     .parseClaimsJws(token)
                     .getBody();
 
-            String username = claims.getSubject();
-            return username;
-        } catch (SignatureException e) {
-            throw e;
+            return claims.getSubject();
         } catch (Exception e) {
-            throw e;
+            throw new RuntimeException("Invalid token: " + e.getMessage());
         }
     }
 
     public List<String> extractRoles(String token) {
         try {
-
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(getSignKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
 
-            List<String> roles = claims.get("roles", List.class);
-            return roles;
-        } catch (SignatureException e) {
-            throw e;
+            return claims.get("roles", List.class);
         } catch (Exception e) {
-            throw e;
+            throw new RuntimeException("Cannot extract roles from token: " + e.getMessage());
+        }
+    }
+
+    public String extractUnitCode(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSignKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.get("unitcode", String.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot extract unitCode from token: " + e.getMessage());
         }
     }
 

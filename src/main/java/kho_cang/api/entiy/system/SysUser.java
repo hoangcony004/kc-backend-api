@@ -33,7 +33,7 @@ public class SysUser {
     private String phone;
 
     @Column(name = "gender", columnDefinition = "SMALLINT DEFAULT 0")
-    private Short gender = 0;
+    private Short gender = 2;
 
     @Column(name = "address", columnDefinition = "TEXT")
     private String address;

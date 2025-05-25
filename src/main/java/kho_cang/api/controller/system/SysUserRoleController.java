@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import kho_cang.api.core.gencode.ApiResponse;
 import kho_cang.api.entiy.dto.SysUserRoleDTO;
+import kho_cang.api.entiy.dto.UserRoleDTO;
 import kho_cang.api.entiy.system.SysRole;
 import kho_cang.api.entiy.system.SysUser;
 import kho_cang.api.entiy.system.SysUserRole;
@@ -67,6 +70,18 @@ public class SysUserRoleController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(), 500));
+        }
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse> getUserRoleByUserId(@PathVariable Long userId) {
+        try {
+            UserRoleDTO userRole = sysUserRoleService.getUserRoleByUserId(userId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponse(ApiResponse.Status.SUCCESS, "Lấy user role thành công", 200, userRole));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(ApiResponse.Status.ERROR, "Lỗi: " + e.getMessage(), 404));
         }
     }
 
